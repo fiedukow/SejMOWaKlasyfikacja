@@ -1,3 +1,7 @@
+##Library check
+library("party") ##library with decision tree
+library("e1071") ##library with naive bayes
+
 ## Loading data
 glosowania = read.table("data/glosowania.txt", sep="\t", header=T, row.names=1) 
 glosowaniaPartie = read.table("data/party_affiliations.txt", sep="\t", header=T, row.names=1) 
@@ -63,3 +67,12 @@ changed_party = apply(glosowaniaPartie_m, 1, function (r) {
                                              })
 poslowieMeta = cbind(poslowieMeta, party_changed = changed_party)
 
+##Add another another attributes to +
+decisionTree = ctree(party_changed ~ own_dst + own_dst_norm, data=poslowieMeta)
+
+##example usage to predict whether patry has changed:
+##predict(decisionTree, newdata=poslowieMeta) - newdata should be data, which we want to predict party_changed (also it should have computed attributes)
+
+##naive bayes
+bayes = naiveBayes(party_changed ~ own_dst + own_dst_norm, data=poslowieMeta)
+##predict should work same as with decision trees, but something is wrong - to investigate
