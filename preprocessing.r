@@ -23,6 +23,7 @@ glosowania_to_avg = replace(glosowania_m, which(glosowania_m == -1), 0)
 partie = unique(c(glosowaniaPartie_m))
 
 ### Create table of parties votes as avearage vote of peoples in this party
+### each cell is in [0, 1] range
 ### eg.
 ###        voting1 voting2 voting3
 ### party1   0.72    0.4     0.11
@@ -47,7 +48,7 @@ for (i in 1:dim(glosowania_to_avg)[2]) {
 partyVotes = replace(partyVotes, which(is.na(partyVotes) | is.nan(partyVotes)), 0.5)
 
 # perfect_vote table is modified table of votes where each deputy has vote of his
-# party assigned to himself. It might be impossible value though as single deputy can only
+# party assigned to him. It might be impossible value though as single deputy can only
 # vote 0, 0.5 or 1 and party vote may be any floting point number.
 perfect_vote = glosowania_to_avg
 for (i in 1:dim(perfect_vote)[1]) {
@@ -82,6 +83,45 @@ for (i in 1:dim(party_dsts_normalizer)[1]) {
 party_dsts_normalized = party_dsts - party_dsts_normalizer;
 avg_party_dsts_normalized = apply(party_dsts_normalized, 1, mean, na.rm=TRUE)
 
+
+## Creates single column of parties modes (one voting all parties)
+## Needs single vector of votes and single vector of parties coresponding to votes
+partyModes_single = function(votes, parties) {
+  glosy = table(votes, parties) 
+  apply(glosy, 2, function(x) { mean(as.numeric(rownames(glosy)[which(x == max(x))])) })    
+}
+
+partyModes = matrix(nrow=length(partie), ncol=dim(glosowania_to_avg)[2])
+rownames(partyModes) = partie;
+colnames(partyModes) = colnames(glosowania_m)
+for (i in 1:dim(glosowania_to_avg)[2]) {
+  partyMode = partyModes_single(glosowania_to_avg[,i], glosowaniaPartie_m[,i])  
+  partyModes[,i] = replace(partyModes[,i], labels(partyMode), partyMode)
+}
+
+# if we were not able to calculate proper value, we will use "neutral" - 0.5
+partyModes = replace(partyModes, which(is.na(partyVotes) | is.nan(partyVotes)), 0.5)
+
+# perfect_vote_mode table is modified table of votes where each deputy has mode vote of his
+# party assigned to him. It is value from set {0, 0.25, 0.5, 0.75, 1}
+perfect_vote_mode = glosowania_to_avg
+for (i in 1:dim(perfect_vote_mode)[1]) {
+  for (j in 1:dim(perfect_vote_mode)[2]) {  
+    perfect_vote_mode[i, j] = partyModes[glosowaniaPartie_m[i, j], j]
+  }
+}
+
+# party_dsts_mode table shows how far was each deputy from his party perfect mode vote
+party_dsts_mode = abs(glosowania_to_avg - perfect_vote_mode)
+avg_party_dsts_mode = apply(party_dsts_mode, 1, mean, na.rm=TRUE)
+
+#### ANOTHER PARAMETER IS AVERAGE DISTANCE FROM PARTY MODE VOTES
+poslowieMeta = cbind(poslowieMeta, own_mode_dst = avg_party_dsts_mode)
+
+# party_dsts table shows how far was each deputy from his party perfect vote
+party_dsts = abs(glosowania_to_avg - perfect_vote)
+avg_party_dsts = apply(party_dsts, 1, mean, na.rm=TRUE)
+
 #### OUR SECOND PARAMETER IS AVERAGE DISTANCE FROM PARTY VOTES NORMALIZED
 #### BY EACH VOTING LOYALITY OF THE PARTY.
 poslowieMeta = cbind(poslowieMeta, own_dst_norm = avg_party_dsts_normalized)
@@ -91,6 +131,8 @@ changed_party = apply(glosowaniaPartie_m, 1, function (r) {
                                                length(unique(r[which(r != "brak-informacji")])) > 1
                                              })
 poslowieMeta = cbind(poslowieMeta, party_changed = changed_party)
+
+
 
 
 #### BUILDING THE MODEL
