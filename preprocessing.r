@@ -284,10 +284,27 @@ half_poslowieMeta = cbind(half_poslowieMeta, own_mode_dst = half_party_mode_dist
 #### BUILDING THE MODEL
 
 ##Add another another attributes to +
-decisionTree = ctree(party_changed ~ own_dst + own_dst_norm + own_mode_dst, data = poslowieMeta)
+decisionTree = ctree(party_changed ~ own_dst + own_mode_dst, data = poslowieMeta)
 
 ##example usage to predict whether patry has changed:
 predict(decisionTree, newdata = half_poslowieMeta) # newdata should be data, which we want to predict party_changed (also it should have computed attributes)
 
 ##naive bayes
-bayes = naiveBayes(party_changed ~ own_dst + own_dst_norm, data=poslowieMeta) ##predict should work same as with decision trees, but something is wrong - to investigate
+bayes = naiveBayes(as.factor(party_changed) ~ own_dst + own_mode_dst, data=poslowieMeta) ##predict works same as for decistion tree
+
+#### Naive threshold methods
+create_naive_threshold = function(column_to_predict, column_to_use_for_predict, data){
+	tmp_data = data[column_to_use_for_predict]
+	#TODO count naive treshold
+	result = list(ctufp=column_to_use_for_predict, val=0.5)
+	return(result)
+}
+
+predict_naive_threshold = function(naive_threshold_obj, data){
+	data_column = data[naive_threshold_obj$ctufp]
+	result = ifelse(data_column[naive_threshold_obj$ctufp] > naive_threshold_obj$val, TRUE, FALSE)
+	return(result)
+}
+
+aaaa = create_naive_threshold("aaaaaa", "own_dst", poslowieMeta)
+
