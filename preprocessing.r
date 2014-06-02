@@ -87,14 +87,14 @@ statistic_party_vote_distance_normalized = function(votes_values,
   rownames(partyLoyality) = partie;
   colnames(partyLoyality) = colnames(party_dsts)
   for (i in 1:dim(party_dsts)[2]) {
-    partyLoyal = partyVotes_single(party_dsts[,i], glosowaniaPartie_m[,i])  
+    partyLoyal = partyVotes_single(party_dsts[,i], votes_parties[,i])  
     partyLoyality[,i] = replace(partyLoyality[,i], labels(partyLoyal), partyLoyal)
   }
 
   party_dsts_normalizer = glosowania_to_avg
   for (i in 1:dim(party_dsts_normalizer)[1]) {
     for (j in 1:dim(party_dsts_normalizer)[2]) {
-      party_dsts_normalizer[i, j] = partyLoyality[glosowaniaPartie_m[i, j], j]
+      party_dsts_normalizer[i, j] = partyLoyality[votes_parties[i, j], j]
     }
   }
 
@@ -205,7 +205,8 @@ generateStatistic = function(statistic,
 glosowania = read.table("data/glosowania.txt", sep="\t", header=T, row.names=1) 
 glosowaniaPartie = read.table("data/party_affiliations.txt", sep="\t", header=T, row.names=1) 
 glosowaniaMeta = read.table("data/glosowania_metadata.txt", sep="\t", header=T, row.names=1) 
-poslowieMeta = read.table("data/poslowie_metadata.txt", sep="\t", header=T, row.names=1) 
+poslowieMeta_base = read.table("data/poslowie_metadata.txt", sep="\t", header=T, row.names=1) 
+poslowieMeta = poslowieMeta_base
 glosowania_m = as.matrix(glosowania)
 glosowaniaPartie_m = as.matrix(glosowaniaPartie)
 glosowaniaPartie_m = replace(glosowaniaPartie_m, which(is.na(glosowaniaPartie_m)), "brak-informacji")
@@ -255,27 +256,28 @@ poslowieMeta = cbind(poslowieMeta, party_changed = changed_party)
 ###############################################
 half_length = dim(glosowania_to_avg)[2]/2
 half_data_avg = glosowania_to_avg[,1:half_length]
-half_poslowieMeta = poslowieMeta
+half_data_partie = glosowaniaPartie_m[,1:half_length]
+half_poslowieMeta = poslowieMeta_base
 
 #### OUR FIRST PARAMETER IS AVERAGE DISTANCE FROM PARTY VOTES
 half_party_vote_distance_own = generateStatistic("party_vote_distance",
-                                                 glosowania_to_avg,
-                                                 glosowaniaPartie_m,
+                                                 half_data_avg,
+                                                 half_data_partie,
                                                  partie)
 half_poslowieMeta = cbind(half_poslowieMeta, own_dst = half_party_vote_distance_own)
 
 #### OUR SECOND PARAMETER IS AVERAGE DISTANCE FROM PARTY VOTES NORMALIZED
 #### BY EACH VOTING LOYALITY OF THE PARTY.
 half_avg_party_dsts_normalized = generateStatistic("party_vote_distance_normalized",
-                                                   glosowania_to_avg,
-                                                   glosowaniaPartie_m,
+                                                   half_data_avg,
+                                                   half_data_partie,
                                                    partie)
 half_poslowieMeta = cbind(half_poslowieMeta, own_dst_norm = half_avg_party_dsts_normalized)
 
 #### ANOTHER PARAMETER IS AVERAGE DISTANCE FROM PARTY MODE VOTES
 half_party_mode_distance_own = generateStatistic("party_mode_distance",
-                                                 glosowania_to_avg,
-                                                 glosowaniaPartie_m,
+                                                 half_data_avg,
+                                                 half_data_partie,
                                                  partie)
 half_poslowieMeta = cbind(half_poslowieMeta, own_mode_dst = half_party_mode_distance_own)
 
