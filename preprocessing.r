@@ -335,3 +335,16 @@ predict_naive_threshold_quantile = function(column_to_use_for_predict, quantile_
 ## example usage:
 naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.5, poslowieMeta) # quantile of rank 0.5 which is median
 
+################################
+##Draw roc curve with rocr lib##
+####################################################################################################
+##		predictions: vector,matrix which contains predictions
+##		labels: vector, matrix which contains true class labels. Must dimensions like predictions
+##		order: which is negative and which positive example: c("0", "1");
+####################################################################################################
+draw_roc_curve = function(roc_predictions, roc_labels, roc_order)
+{
+	pred <- prediction(roc_predictions, roc_labels, label.ordering = roc_order) ##create prediction model
+	perf <- performance(predicted_model, measure = "tpr", x.measure = "fpr") 
+	plot(perf)
+}
