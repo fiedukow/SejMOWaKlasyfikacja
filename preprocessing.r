@@ -1,6 +1,7 @@
 ##Library check
 library("party") ##library with decision tree
 library("e1071") ##library with naive bayes
+library("ROCR") ##library with roc curve
 
 ##############################################################
 ## Calculate Party Distance party for each vote separetly.  ##
