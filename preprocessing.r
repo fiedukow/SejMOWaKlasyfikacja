@@ -352,4 +352,4 @@ draw_roc_curve = function(roc_predictions, roc_labels, roc_order)
 naive_threshold_result_bin <- ifelse(naive_threshold_result == TRUE, 1,0)
 poslowieMetaBin <- ifelse(poslowieMeta[,"party_changed"] == TRUE, 1, 0)
 
-draw_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(1,0))
+draw_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(0,1))
