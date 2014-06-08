@@ -172,14 +172,31 @@ naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.5, posl
 ##		labels: vector, matrix which contains true class labels. Must dimensions like predictions
 ##		order: which is negative and which positive example: c("0", "1");
 ####################################################################################################
-draw_roc_curve = function(roc_predictions, roc_labels, roc_order)
+pref_roc_curve = function(roc_predictions, roc_labels, roc_order)
 {
 	predicted_model <- prediction(roc_predictions, roc_labels, label.ordering = roc_order) ##create prediction model
-	perf <- performance(predicted_model, measure = "tpr", x.measure = "fpr") 
-	plot(perf)
+	#perf <- performance(predicted_model, measure = "tpr", x.measure = "fpr") 
+	#plot(pref)
+	return(performance(predicted_model, measure = "tpr", x.measure = "fpr") )
 }
 
+naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.5, poslowieMeta) # quantile of rank 0.5 which is median
 naive_threshold_result_bin <- ifelse(naive_threshold_result == TRUE, 1,0)
 poslowieMetaBin <- ifelse(poslowieMeta[,"party_changed"] == TRUE, 1, 0)
+perf1 <- pref_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(0,1))
 
-draw_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(0,1))
+naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.8, poslowieMeta) # quantile of rank 0.8 which is median
+naive_threshold_result_bin <- ifelse(naive_threshold_result == TRUE, 1,0)
+poslowieMetaBin <- ifelse(poslowieMeta[,"party_changed"] == TRUE, 1, 0)
+perf2 <- pref_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(0,1))
+
+
+naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 1.0, poslowieMeta) # quantile of rank 1.0 which is median
+naive_threshold_result_bin <- ifelse(naive_threshold_result == TRUE, 1,0)
+poslowieMetaBin <- ifelse(poslowieMeta[,"party_changed"] == TRUE, 1, 0)
+perf3 <- pref_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(0,1))
+
+naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.0, poslowieMeta) # quantile of rank 0.0 which is median
+naive_threshold_result_bin <- ifelse(naive_threshold_result == TRUE, 1,0)
+poslowieMetaBin <- ifelse(poslowieMeta[,"party_changed"] == TRUE, 1, 0)
+perf4 <- pref_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(0,1))
