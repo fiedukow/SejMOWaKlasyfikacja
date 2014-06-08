@@ -77,13 +77,20 @@ statistic_party_vote_distance_normalized = function(votes_values,
                                    votes_parties,
                                    parties,
                                    party_to_calculate_statistic_to)
+  
+  ## Creates single column of parties votes (one voting all parties)
+  ## Needs single vector of votes and single vector of parties coresponding to votes
+  party_votes_column = function(votes, parties) {
+    votes_table = table(votes, parties)
+    apply(votes_table, 2, function(x) { weighted.mean(as.numeric(rownames(votes_table)), as.numeric(x)) })
+  }
 
   # party loyality is average distance of deputy from the party to his party vote.
   partyLoyality = matrix(nrow=length(partie), ncol=dim(party_dsts)[2])
   rownames(partyLoyality) = partie;
   colnames(partyLoyality) = colnames(party_dsts)
   for (i in 1:dim(party_dsts)[2]) {
-    partyLoyal = partyVotes_single(party_dsts[,i], votes_parties[,i])
+    partyLoyal = party_votes_column(party_dsts[,i], votes_parties[,i])
     partyLoyality[,i] = replace(partyLoyality[,i], labels(partyLoyal), partyLoyal)
   }
 

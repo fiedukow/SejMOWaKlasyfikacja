@@ -48,6 +48,20 @@ party_mode_distance_own = generateStatistic("party_mode_distance",
                                             partie)
 poslowieMeta = cbind(poslowieMeta, own_mode_dst = party_mode_distance_own)
 
+#### ANOTHER PARAMETER IS AVERAGE LENGHT OF STREAK AGAINST PARTY
+party_mode_against_streak_avg = generateStatistic("against_party_mode_average_streak",
+                                                  glosowania_to_avg,
+                                                  glosowaniaPartie_m,
+                                                  partie)
+poslowieMeta = cbind(poslowieMeta, avg_streak_against_party = party_mode_against_streak_avg)
+
+#### ANOTHER PARAMETER IS MAX LENGHT OF STREAK AGAINST PARTY
+party_mode_against_streak_max = generateStatistic("against_party_mode_max_streak",
+                                                  glosowania_to_avg,
+                                                  glosowaniaPartie_m,
+                                                  partie)
+poslowieMeta = cbind(poslowieMeta, max_streak_against_party = party_mode_against_streak_max)
+
 #### CLASS CALCULATING
 changed_party = apply(glosowaniaPartie_m, 1, function (r) {
                                                length(unique(r[which(r != "brak-informacji")])) > 1
@@ -62,12 +76,13 @@ half_length = dim(glosowania_to_avg)[2]/2
 half_data_avg = glosowania_to_avg[,1:half_length]
 half_data_partie = glosowaniaPartie_m[,1:half_length]
 half_poslowieMeta = poslowieMeta_base
+half_partie = unique(c(half_data_partie))
 
 #### OUR FIRST PARAMETER IS AVERAGE DISTANCE FROM PARTY VOTES
 half_party_vote_distance_own = generateStatistic("party_vote_distance",
                                                  half_data_avg,
                                                  half_data_partie,
-                                                 partie)
+                                                 half_partie)
 half_poslowieMeta = cbind(half_poslowieMeta, own_dst = half_party_vote_distance_own)
 
 #### OUR SECOND PARAMETER IS AVERAGE DISTANCE FROM PARTY VOTES NORMALIZED
@@ -75,14 +90,14 @@ half_poslowieMeta = cbind(half_poslowieMeta, own_dst = half_party_vote_distance_
 half_avg_party_dsts_normalized = generateStatistic("party_vote_distance_normalized",
                                                    half_data_avg,
                                                    half_data_partie,
-                                                   partie)
+                                                   half_partie)
 half_poslowieMeta = cbind(half_poslowieMeta, own_dst_norm = half_avg_party_dsts_normalized)
 
 #### ANOTHER PARAMETER IS AVERAGE DISTANCE FROM PARTY MODE VOTES
 half_party_mode_distance_own = generateStatistic("party_mode_distance",
                                                  half_data_avg,
                                                  half_data_partie,
-                                                 partie)
+                                                 half_partie)
 half_poslowieMeta = cbind(half_poslowieMeta, own_mode_dst = half_party_mode_distance_own)
 
 ## Removing deputies which already made their choice ;)

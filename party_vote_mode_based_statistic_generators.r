@@ -51,3 +51,58 @@ statistic_party_mode_distance = function(votes_values,
   return(avg_party_dsts_mode)
 }
 
+##############################################################
+## Average Lenght of Streak of Votes against Party Vote Mode##
+##############################################################
+streaks_table = function(votes_values,
+                         votes_parties,
+                         parties,
+                         party_to_calculate_statistic_to) {
+  party_dsts_mode = party_vote_mode_distance(votes_values,
+                                             votes_parties,
+                                             parties,
+                                             party_to_calculate_statistic_to)
+  party_dsts_mode = replace(party_dsts_mode, which(party_dsts_mode != 0), 1)
+  party_dsts_mode_streaks = apply(
+    party_dsts_mode,
+    1,
+    function(x) {
+      for (i in 2:length(x)) {
+        if (is.na(x[i-1]))
+          x[i-1] = 0
+        x[i] = (x[i-1]+1)*x[i]
+      }
+      if (is.na(x[length(x)]))
+        x[length(x)] = 0
+      return(x)
+    }
+  )
+
+  return(t(party_dsts_mode_streaks))
+}
+
+statistic_against_party_mode_average_streak = function(votes_values,
+                                                       votes_parties,
+                                                       parties,
+                                                       party_to_calculate_statistic_to) {
+  streaks = streaks_table(votes_values,
+                          votes_parties,
+                          parties,
+                          party_to_calculate_statistic_to)
+  avg_against_pary_mode_streak = apply(streaks, 1, mean, na.rm=TRUE)
+
+  return(avg_against_pary_mode_streak)
+}
+
+statistic_against_party_mode_max_streak = function(votes_values,
+                                                   votes_parties,
+                                                   parties,
+                                                   party_to_calculate_statistic_to) {
+  streaks = streaks_table(votes_values,
+                          votes_parties,
+                          parties,
+                          party_to_calculate_statistic_to)
+
+  max_against_pary_mode_streak = apply(streaks, 1, max, na.rm=TRUE)
+  return(max_against_pary_mode_streak)
+}

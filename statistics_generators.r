@@ -55,6 +55,16 @@ generateStatistic = function(statistic,
            statistic_party_mode_distance(votes_values,
                                          votes_parties,
                                          parties,
-                                         party_to_calculate_statistic_to)
+                                         party_to_calculate_statistic_to),
+         against_party_mode_average_streak =
+           statistic_against_party_mode_average_streak(votes_values,
+                                                       votes_parties,
+                                                       parties,
+                                                       party_to_calculate_statistic_to),
+         against_party_mode_max_streak =
+           statistic_against_party_mode_max_streak(votes_values,
+                                                   votes_parties,
+                                                   parties,
+                                                   party_to_calculate_statistic_to)
   )
 }
