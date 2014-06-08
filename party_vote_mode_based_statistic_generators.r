@@ -9,8 +9,8 @@ party_vote_mode_distance = function(votes_values,
     apply(votes_table, 2, function(x) { mean(as.numeric(rownames(votes_table)[which(x == max(x))])) })
   }
 
-  party_modes = matrix(nrow=length(partie), ncol=dim(votes_values)[2])
-  rownames(party_modes) = partie;
+  party_modes = matrix(nrow=length(parties), ncol=dim(votes_values)[2])
+  rownames(party_modes) = parties;
   colnames(party_modes) = colnames(votes_parties)
   for (i in 1:dim(votes_values)[2]) {
     party_mode_column_current = party_modes_column(votes_values[,i], votes_parties[,i])

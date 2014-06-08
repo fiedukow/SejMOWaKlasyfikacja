@@ -86,15 +86,15 @@ statistic_party_vote_distance_normalized = function(votes_values,
   }
 
   # party loyality is average distance of deputy from the party to his party vote.
-  partyLoyality = matrix(nrow=length(partie), ncol=dim(party_dsts)[2])
-  rownames(partyLoyality) = partie;
+  partyLoyality = matrix(nrow=length(parties), ncol=dim(party_dsts)[2])
+  rownames(partyLoyality) = parties;
   colnames(partyLoyality) = colnames(party_dsts)
   for (i in 1:dim(party_dsts)[2]) {
     partyLoyal = party_votes_column(party_dsts[,i], votes_parties[,i])
     partyLoyality[,i] = replace(partyLoyality[,i], labels(partyLoyal), partyLoyal)
   }
 
-  party_dsts_normalizer = glosowania_to_avg
+  party_dsts_normalizer = votes_values
   for (i in 1:dim(party_dsts_normalizer)[1]) {
     for (j in 1:dim(party_dsts_normalizer)[2]) {
       party_dsts_normalizer[i, j] = partyLoyality[votes_parties[i, j], j]

@@ -11,7 +11,6 @@ loadAndPreprocess = function(N = NA) {
   ## Loading data
   glosowania = read.table("data/glosowania.txt", sep="\t", header=T, row.names=1)
   glosowaniaPartie = read.table("data/party_affiliations.txt", sep="\t", header=T, row.names=1)
-  glosowaniaMeta = read.table("data/glosowania_metadata.txt", sep="\t", header=T, row.names=1)
   poslowieMeta_base = read.table("data/poslowie_metadata.txt", sep="\t", header=T, row.names=1)
   poslowieMeta = poslowieMeta_base
 
@@ -20,9 +19,9 @@ loadAndPreprocess = function(N = NA) {
   glosowaniaPartie_m = replace(glosowaniaPartie_m, which(is.na(glosowaniaPartie_m)), "brak-informacji")
 
   if (!is.na(N)) {
-    REAL_N = max(N-1, 1)
-    glosowania_m       = glosowania_m[(length(glosowania_m)-(N-1)):length(glosowania_m)]
-    glosowaniaPartie_m = glosowaniaPartie_m[(length(glosowaniaPartie_m)-(N-1)):length(glosowaniaPartie_m)]
+    START_N = max((dim(glosowania_m)[2]-(N-1)), 1)
+    glosowania_m       = glosowania_m[,START_N:dim(glosowania_m)[2]]
+    glosowaniaPartie_m = glosowaniaPartie_m[,START_N:dim(glosowaniaPartie_m)[2]]
   }
 
   ## Modify voting table to meet our numeric interpretation
@@ -83,7 +82,7 @@ loadAndPreprocess = function(N = NA) {
   ##            BUILDING TESTING DATA          ##
   ###############################################
   half_length = dim(glosowania_to_avg)[2]/2
-  beg_half_length = max(elseif(is.na(N), 1, half_length-(N-1)), 1)
+  beg_half_length = max(ifelse(is.na(N), 1, half_length-(N-1)), 1)
   half_data_avg = glosowania_to_avg[,beg_half_length:half_length]
   half_data_partie = glosowaniaPartie_m[,beg_half_length:half_length]
   half_poslowieMeta = poslowieMeta_base
@@ -116,14 +115,14 @@ loadAndPreprocess = function(N = NA) {
                                                          half_data_avg,
                                                          half_data_partie,
                                                          half_partie)
-  half_poslowieMeta = cbind(poslowieMeta, avg_streak_against_party = half_party_mode_against_streak_avg)
+  half_poslowieMeta = cbind(half_poslowieMeta, avg_streak_against_party = half_party_mode_against_streak_avg)
 
   #### ANOTHER PARAMETER IS MAX LENGHT OF STREAK AGAINST PARTY
   half_party_mode_against_streak_max = generateStatistic("against_party_mode_max_streak",
                                                          half_data_avg,
                                                          half_data_partie,
                                                          half_partie)
-  half_poslowieMeta = cbind(poslowieMeta, max_streak_against_party = half_party_mode_against_streak_max)
+  half_poslowieMeta = cbind(half_poslowieMeta, max_streak_against_party = half_party_mode_against_streak_max)
 
   ## Removing deputies which already made their choice ;)
   changed_in_half = unlist(
@@ -137,5 +136,5 @@ loadAndPreprocess = function(N = NA) {
   )
   half_poslowieMeta = half_poslowieMeta[-which(changed_in_half),]
 
-  list(poslowieMeta, half_PoslowieMeta)
+  list(poslowieMeta, half_poslowieMeta)
 }
