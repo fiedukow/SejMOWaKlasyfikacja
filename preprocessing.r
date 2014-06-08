@@ -344,7 +344,12 @@ naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.5, posl
 ####################################################################################################
 draw_roc_curve = function(roc_predictions, roc_labels, roc_order)
 {
-	pred <- prediction(roc_predictions, roc_labels, label.ordering = roc_order) ##create prediction model
+	predicted_model <- prediction(roc_predictions, roc_labels, label.ordering = roc_order) ##create prediction model
 	perf <- performance(predicted_model, measure = "tpr", x.measure = "fpr") 
 	plot(perf)
 }
+
+naive_threshold_result_bin <- ifelse(naive_threshold_result == TRUE, 1,0)
+poslowieMetaBin <- ifelse(poslowieMeta[,"party_changed"] == TRUE, 1, 0)
+
+draw_roc_curve(naive_threshold_result_bin, poslowieMetaBin, c(1,0))
