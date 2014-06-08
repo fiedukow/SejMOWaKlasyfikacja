@@ -4,6 +4,7 @@ library("e1071") ##library with naive bayes
 library("ROCR") ##library with roc curve
 
 source("statistics_generators.r")
+source("treshold_prediction.r")
 
 ## Loading data
 glosowania = read.table("data/glosowania.txt", sep="\t", header=T, row.names=1) 
@@ -122,48 +123,6 @@ predict(decisionTree, newdata = half_poslowieMeta) # newdata should be data, whi
 
 ##naive bayes
 bayes = naiveBayes(as.factor(party_changed) ~ own_dst + own_mode_dst, data=poslowieMeta) ##predict works same as for decistion tree
-
-#############################
-## Naive threshold methods ##
-#############################
-
-#############################################################################
-## This ususes given threshold to predict whether deputy has changed party ##
-#############################################################################
-##    column_to_use_for_predict: name of column to use threshold for.
-##
-##    threshold: threshold to apply. Every value below it is
-##               considered as false. True otherwise.
-##
-##    data: data with deputies to apply threshold
-#############################################################################
-predict_naive_threshold = function(column_to_use_for_predict, threshold, data){
-	data_column = data[column_to_use_for_predict]
-	result = ifelse(data_column[column_to_use_for_predict] > threshold, TRUE, FALSE)
-	return(result)
-}
-
-## example usage: 
-naive_threshold_result = predict_naive_threshold("own_dst", 0.02, poslowieMeta)
-
-##################################################################################
-## This counts given quantile of provided column data, and uses it as threshold ##
-##################################################################################
-##    column_to_use_for_predict: Name of column to use threshold for.
-##
-##    quantile_rank: Rank of quantile (form 0 to 1), to use as threshold.
-##
-##    data: Data with deputies to apply threshold
-##################################################################################
-predict_naive_threshold_quantile = function(column_to_use_for_predict, quantile_rank, data){
-	data_column = data[column_to_use_for_predict]
-	ordered = data_column[order(data_column[,1]),]
-	index = round(length(ordered)*quantile_rank)+1
-	return(predict_naive_threshold(column_to_use_for_predict, ordered[index], data))
-}
-
-## example usage:
-naive_threshold_quantile = predict_naive_threshold_quantile("own_dst", 0.5, poslowieMeta) # quantile of rank 0.5 which is median
 
 ################################
 ##Draw roc curve with rocr lib##
