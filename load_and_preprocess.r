@@ -15,8 +15,10 @@ loadAndPreprocess = function(N = NA) {
   poslowieMeta = poslowieMeta_base
 
   glosowania_m = as.matrix(glosowania)
+  glosowania_m_full = glosowania_m
   glosowaniaPartie_m = as.matrix(glosowaniaPartie)
   glosowaniaPartie_m = replace(glosowaniaPartie_m, which(is.na(glosowaniaPartie_m)), "brak-informacji")
+  glosowaniaPartie_m_full = glosowaniaPartie_m
 
   if (!is.na(N)) {
     START_N = max((dim(glosowania_m)[2]-(N-1)), 1)
@@ -31,6 +33,10 @@ loadAndPreprocess = function(N = NA) {
   glosowania_to_avg = glosowania_m
   glosowania_to_avg = replace(glosowania_m, which(glosowania_m == 0), 0.5)
   glosowania_to_avg = replace(glosowania_m, which(glosowania_m == -1), 0)
+  
+  glosowania_to_avg_full = glosowania_m_full
+  glosowania_to_avg_full = replace(glosowania_m_full, which(glosowania_m == 0), 0.5)
+  glosowania_to_avg_full = replace(glosowania_m_full, which(glosowania_m == -1), 0)
 
   ## Find all parties during cadence
   partie = unique(c(glosowaniaPartie_m))
@@ -72,7 +78,7 @@ loadAndPreprocess = function(N = NA) {
   poslowieMeta = cbind(poslowieMeta, max_streak_against_party = party_mode_against_streak_max)
 
   #### CLASS CALCULATING
-  changed_party = apply(glosowaniaPartie_m, 1, function (r) {
+  changed_party = apply(glosowaniaPartie_m_full, 1, function (r) {
     length(unique(r[which(r != "brak-informacji")])) > 1
   })
   poslowieMeta = cbind(poslowieMeta, party_changed = changed_party)
@@ -81,10 +87,11 @@ loadAndPreprocess = function(N = NA) {
   ###############################################
   ##            BUILDING TESTING DATA          ##
   ###############################################
-  half_length = dim(glosowania_to_avg)[2]/2
+  half_length = dim(glosowania_to_avg_full)[2]/2
   beg_half_length = max(ifelse(is.na(N), 1, half_length-(N-1)), 1)
-  half_data_avg = glosowania_to_avg[,beg_half_length:half_length]
-  half_data_partie = glosowaniaPartie_m[,beg_half_length:half_length]
+  half_data_avg = glosowania_to_avg_full[,beg_half_length:half_length]
+  half_data_partie = glosowaniaPartie_m_full[,beg_half_length:half_length]
+  half_data_partie_full = glosowaniaPartie_m_full[,1:half_length]
   half_poslowieMeta = poslowieMeta_base
   half_partie = unique(c(half_data_partie))
 
@@ -127,7 +134,7 @@ loadAndPreprocess = function(N = NA) {
   ## Removing deputies which already made their choice ;)
   changed_in_half = unlist(
     lapply(
-      apply(half_data_partie, 1, unique),
+      apply(half_data_partie_full, 1, unique),
       function(x) {
         (length(x) > 1 && length(which(x == "brak-informacji")) == 0) ||
           (length(x) > 2)
