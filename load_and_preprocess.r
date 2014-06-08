@@ -1,11 +1,3 @@
-##Library check
-library("party") ##library with decision tree
-library("e1071") ##library with naive bayes
-library("ROCR") ##library with roc curve
-
-source("statistics_generators.r")
-source("treshold_prediction.r")
-
 ## Loading data
 glosowania = read.table("data/glosowania.txt", sep="\t", header=T, row.names=1) 
 glosowaniaPartie = read.table("data/party_affiliations.txt", sep="\t", header=T, row.names=1) 
@@ -65,8 +57,8 @@ poslowieMeta = cbind(poslowieMeta, max_streak_against_party = party_mode_against
 
 #### CLASS CALCULATING
 changed_party = apply(glosowaniaPartie_m, 1, function (r) {
-                                               length(unique(r[which(r != "brak-informacji")])) > 1
-                                             })
+  length(unique(r[which(r != "brak-informacji")])) > 1
+})
 poslowieMeta = cbind(poslowieMeta, party_changed = changed_party)
 
 
@@ -117,28 +109,12 @@ half_poslowieMeta = cbind(poslowieMeta, max_streak_against_party = half_party_mo
 
 ## Removing deputies which already made their choice ;)
 changed_in_half = unlist(
-                    lapply(
-                      apply(half_data_partie, 1, unique),
-                      function(x) {
-                          (length(x) > 1 && length(which(x == "brak-informacji")) == 0) ||
-                          (length(x) > 2)
-                      }
-                    )
-                  )
+  lapply(
+    apply(half_data_partie, 1, unique),
+    function(x) {
+      (length(x) > 1 && length(which(x == "brak-informacji")) == 0) ||
+        (length(x) > 2)
+    }
+  )
+)
 half_poslowieMeta = half_poslowieMeta[-which(changed_in_half),]
-
-#### BUILDING THE MODEL
-
-##Add another another attributes to +
-decisionTree = ctree(party_changed ~ own_dst + own_mode_dst, data = poslowieMeta)
-
-##example usage to predict whether patry has changed:
-predict(decisionTree, newdata = half_poslowieMeta) # newdata should be data, which we want to predict party_changed (also it should have computed attributes)
-
-##naive bayes
-bayes = naiveBayes(as.factor(party_changed) ~ own_dst + own_mode_dst, data=poslowieMeta) ##predict works same as for decistion tree
-
-naive_threshold_result_bin <- as.numeric(naive_threshold_result)
-poslowieMetaBin <- as.numeric(poslowieMeta[,"party_changed"])
-
-draw_roc_curve(naive_threshold_result_bin, poslowieMetaBin)
