@@ -1,3 +1,5 @@
+source("statistics_generators.r")
+
 ##############################################################
 ## This is interface for loading data and creating the meta ##
 ## data content                                             ##
@@ -129,7 +131,11 @@ loadAndPreprocess = function(N = NA) {
                                                          half_data_avg,
                                                          half_data_partie,
                                                          half_partie)
+
   half_poslowieMeta = cbind(half_poslowieMeta, max_streak_against_party = half_party_mode_against_streak_max)
+
+  #### CLASS CALCULATING
+  half_poslowieMeta = cbind(half_poslowieMeta, party_changed = changed_party)
 
   ## Removing deputies which already made their choice ;)
   changed_in_half = unlist(
