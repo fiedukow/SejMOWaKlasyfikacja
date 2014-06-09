@@ -19,7 +19,7 @@ loadAndPreprocess = function(N = NA) {
   glosowania_m = as.matrix(glosowania)
   glosowania_m_full = glosowania_m
   glosowaniaPartie_m = as.matrix(glosowaniaPartie)
-  glosowaniaPartie_m = replace(glosowaniaPartie_m, which(is.na(glosowaniaPartie_m)), "brak-informacji")
+  glosowaniaPartie_m = t(apply(glosowaniaPartie_m, 1, function (x) { ifelse(is.na(x), labels(which.max(table(x))), x) }))
   glosowaniaPartie_m_full = glosowaniaPartie_m
 
   if (!is.na(N)) {
