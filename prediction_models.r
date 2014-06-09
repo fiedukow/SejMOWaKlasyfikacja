@@ -31,7 +31,7 @@ tresholdPrediction = function(data_build, data_testing, statistic) {
   data_testing[,statistic]
 }
 
-PredictAndDrawAll = function(DATA, ...) {
+PredictAndDrawAll = function(DATA, filename = "tmp", ...) {
   allPredictions = matrix(c(0), nrow = 7, ncol=length(DATA[[2]][,"party_changed"]))
   expected = DATA[[2]][,"party_changed"]
 
@@ -44,6 +44,9 @@ PredictAndDrawAll = function(DATA, ...) {
   allPredictions[7,] = tresholdPrediction(DATA[[1]], DATA[[2]], "max_streak_against_party")
   colors = c("red","green","blue","yellow","brown","black","orange")
 
+  png(filename = paste("./plots/", filename, ".png", sep=""),
+      width = 852, height = 711, units = "px", pointsize = 16,
+      bg = "white")
   for (i in 1:7) {
     draw_roc_curve(allPredictions[i,], expected, add=(i>1), lwd=3, col=colors[i], ...)
   }
@@ -58,5 +61,6 @@ PredictAndDrawAll = function(DATA, ...) {
                     "Treshold - max. streak against party mode"),
          lwd = 3,
          col = colors)
-  #draw_roc_curve(t(allPredictions), t(expected), colors=c("red","green","blue","yellow","brown","black","orange"))
+
+  dev.off();
 }
