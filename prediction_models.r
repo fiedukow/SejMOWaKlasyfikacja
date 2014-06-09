@@ -67,13 +67,13 @@ PredictAndDrawAll = function(DATA, filename = "tmp", ...) {
   colors = c("red","green","blue","yellow","brown","black","orange","pink","gray","darkgreen")
 
   png(filename = paste("./plots/", filename, ".png", sep=""),
-      width = 640, height = 480, units = "px", pointsize = 12,
+      width = 800, height = 600, units = "px", pointsize = 12,
       bg = "white")
   for (i in 1:9) {
     draw_roc_curve(allPredictions[i,], expected, add=(i>1), lwd=3, col=colors[i], ...)
   }
 
-  legend(x=0.465, y=0.33,
+  legend(x=0.565, y=0.3,
          legend = c("Naive Bayes",
                     "Decisive Tree",
                     "Decisive Tree - random forest variable selection",
